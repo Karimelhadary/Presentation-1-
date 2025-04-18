@@ -1,0 +1,17 @@
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def display_info(self):
+        return f"Name: {self.name}, Age: {self.age}"
+       
+class Student(Person):
+        def __init__(self, name, age, student_id, courses):
+            super().__init__(name, age)
+            self.student_id = student_id
+            self.courses = courses
+            
+        def display_info(self):
+            base_info = super().display_info()
+            return f"{base_info}, Student ID: {self.student_id}, Courses: {', '.join(self.courses)}"
