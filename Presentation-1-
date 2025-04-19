@@ -15,3 +15,11 @@ class Student(Person):
         def display_info(self):
             base_info = super().display_info()
             return f"{base_info}, Student ID: {self.student_id}, Courses: {', '.join(self.courses)}"
+        
+        def add_course(self, course):
+            if course not in self.courses:
+                self.courses.append(course)
+
+        def remove_course(self, course):
+            if course in self.courses:
+                self.courses.remove(course)
