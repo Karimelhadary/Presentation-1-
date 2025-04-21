@@ -23,12 +23,24 @@ class Student(Person):
         def remove_course(self, course):
             if course in self.courses:
                 self.courses.remove(course)
-                class StudentManagementSystem:
-                    def __init__(self):
+class StudentManagementSystem:
+        def __init__(self):
                         self.students = []
 
-                    def add_student(self, student):
+        def add_student(self, student):
                         self.students.append(student)
 
-                    def remove_student(self, student_id):
+        def remove_student(self, student_id):
                         self.students = [student for student in self.students if student.student_id != student_id]
+                        
+        def search_student(self, student_id):
+            for student in self.students:
+                if student.student_id == student_id:
+                    return student
+                return None
+
+        def display_students(self):
+            for student in self.students:
+                print(student.display_info())
+        def sort_students_by_name(self):
+            self.students.sort(key=lambda st: st.name)#st=students
