@@ -44,3 +44,27 @@ class StudentManagementSystem:
                 print(student.display_info())
         def sort_students_by_name(self):
             self.students.sort(key=lambda st: st.name)#st=students
+
+        def sort_students_by_age(self):
+                self.students.sort(key=lambda st: st.age)
+
+        def save_students_to_file(self, filename):
+            with open(filename, 'w') as file:
+                for student in self.students:
+                    file.write(student.display_info() + '\n')
+
+        def load_students_from_file(self, filename):
+            try:
+                with open(filename, 'r') as file:
+                    for line in file:
+                        data = line.strip().split(', ')
+                        name = data[0].split(': ')[1]
+                        age = int(data[1].split(': ')[1])
+                        student_id = data[2].split(': ')[1]
+                        courses = data[3].split(': ')[1].split(', ')
+                        student = Student(name, age, student_id, courses)
+                        self.add_student(student)
+            except FileNotFoundError:
+                print(f"File {filename} not found.")
+            except Exception as e:
+                print(f"An error occurred: {e}")
