@@ -68,3 +68,79 @@ class StudentManagementSystem:
                 print(f"File {filename} not found.")
             except Exception as e:
                 print(f"An error occurred: {e}")
+                
+def main():
+    system = StudentManagementSystem()
+    initial_students = [
+            Student("Karim", 30, "a021", ["Coding", "Biology"]),
+            Student("Fatya", 28, "a1012", ["Histograms", "English"]),
+            Student("omar", 24, "a0343", ["Statistics", "Linear algebra"])
+    ]
+    for student in initial_students:
+        system.add_student(student) 
+
+    while True:
+        print("\nStudent Management System")
+        print("1. Add Student")
+        print("2. Remove Student")
+        print("3. Search Student")
+        print("4. Display Students")
+        print("5. Sort Students by Name")
+        print("6. Sort Students by Age")
+        print("7. Save Students to File")
+        print("8. Load Students from File")
+        print("9. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+                name = input("Enter student name: ")
+                age = int(input("Enter student age: "))
+                student_id = input("Enter student ID: ")
+                courses = input("Enter courses (comma-separated): ").split(',')
+                student = Student(name, age, student_id, courses)
+                system.add_student(student)
+                print("Student added successfully.")
+
+        elif choice == '2':
+            student_id = input("Enter student ID to remove: ")
+            system.remove_student(student_id)
+            print("Student removed successfully.")
+
+        elif choice == '3':
+            student_id = input("Enter student ID to search: ")
+            student = system.search_student(student_id)
+            if student:
+                print(student.display_info())
+            else:
+                print("Student not found.")
+
+        elif choice == '4':
+            system.display_students()
+
+        elif choice == '5':
+            system.sort_students_by_name()
+            print("Students sorted by name.")
+
+        elif choice == '6':
+            system.sort_students_by_age()
+            print("Students sorted by age.")
+
+        elif choice == '7':
+            filename = input("Enter filename to save students: ")
+            system.save_students_to_file(filename)
+            print("Students saved to file successfully.")
+
+        elif choice == '8':
+            filename = input("Enter filename to load students: ")
+            system.load_students_from_file(filename)
+            print("Students loaded from file successfully.")
+
+        elif choice == '9':
+            print("Exiting the system.")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
