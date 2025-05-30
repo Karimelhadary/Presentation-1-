@@ -1,3 +1,8 @@
+from abc import ABC, abstractmethod
+import time
+import csv
+
+
 class Person:
     def __init__(self, name, age):
         self.name = name
@@ -7,10 +12,11 @@ class Person:
         return f"Name: {self.name}, Age: {self.age}"
        
 class Student(Person):
-        def __init__(self, name, age, student_id, courses):
+        def __init__(self, name, age, student_id, courses, logical_expression):
             super().__init__(name, age)
             self.student_id = student_id
             self.courses = courses
+            self.logical_expression = logical_expression
             
         def display_info(self):
             base_info = super().display_info()
