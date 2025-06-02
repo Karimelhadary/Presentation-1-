@@ -136,17 +136,35 @@ class StudentManagementSystem:
                         students[k] = right_half[j]
                         j += 1
                         k += 1
-            return students     
+            return students
+        
+        def evaluate_logical_expression(expression):
+            try:
+                return eval(expression)
+            except:
+                return False 
+        def sort_by_logical_expression(students):
+            students.sort(key=lambda x: evaluate_logical_expression(x.logical_expression))
+            return students
+            
 def main():
     system = StudentManagementSystem()
+    initial_courses = [
+        Course("a122", "Math", "Dr.Majeed"),
+        Course("sas", "Science", "Dr.Ali"),
+        Course("RA3", "History", "Dr.Mohamed")
+    ]
+    for course in initial_courses:
+        system.add_course(course)
+
     initial_students = [
-            Student("Karim", 30, "a021", ["Coding", "Biology"]),
-            Student("Fatya", 28, "a1012", ["Histograms", "English"]),
-            Student("omar", 24, "a0343", ["Statistics", "Linear algebra"])
+        Student("Karim", 30, "a122", [initial_courses[0], initial_courses[1]], "True"),
+        Student("Fatya", 28, "Sas", [initial_courses[1], initial_courses[2]], "False"),
+        Student("Omar", 24, "RA3", [initial_courses[0], initial_courses[2]], "True")
     ]
     for student in initial_students:
-        system.add_student(student) 
-
+        system.add_student(student)
+        
     while True:
         print("\nStudent Management System")
         print("1. Add Student")
