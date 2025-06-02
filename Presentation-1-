@@ -2,157 +2,171 @@ from abc import ABC, abstractmethod
 import time
 import csv
 
-
-class Person:
+class Person(ABC):
     def __init__(self, name, age):
         self.name = name
         self.age = age
 
     def display_info(self):
         return f"Name: {self.name}, Age: {self.age}"
-       
+
 class Student(Person):
-        def __init__(self, name, age, student_id, courses, logical_expression):
-            super().__init__(name, age)
-            self.student_id = student_id
-            self.courses = courses
-            self.logical_expression = logical_expression
-            
-        def display_info(self):
-            base_info = super().display_info()
-            return f"{base_info}, Student ID: {self.student_id}, Courses: {', '.join(self.courses)}"
-        
-        def add_course(self, course):
-            if course not in self.courses:
-                self.courses.append(course)
+    def __init__(self, name, age, student_id, courses, logical_expression):
+        super().__init__(name, age)
+        self.student_id = student_id
+        self.courses = courses  
+        self.logical_expression = logical_expression  
 
-        def remove_course(self, course):
-            if course in self.courses:
-                self.courses.remove(course)
-                
-# Class for Course
+    def display_info(self):
+        base_info = super().display_info()
+        course_names = ', '.join(course.course_name for course in self.courses)
+        return f"{base_info}, Student ID: {self.student_id}, Courses: {course_names}, Logical Expression: {self.logical_expression}"
+
+    def add_course(self, course):
+        if course not in self.courses:
+            self.courses.append(course)
+
+    def remove_course(self, course):
+        if course in self.courses:
+            self.courses.remove(course)
+
 class Course:
-        def __init__(self, course_id, course_name, instructor):
-            self.course_id = course_id
-            self.course_name = course_name
-            self.instructor = instructor
+    def __init__(self, course_id, course_name, instructor):
+        self.course_id = course_id
+        self.course_name = course_name
+        self.instructor = instructor
 
-        def display_info(self):
-            return f"Course ID: {self.course_id}, Course Name: {self.course_name}, Instructor: {self.instructor}"
+    def display_info(self):
+        return f"Course ID: {self.course_id}, Course Name: {self.course_name}, Instructor: {self.instructor}"
 
 class StudentManagementSystem:
-        def __init__(self):
-                        self.students = []
+    def __init__(self):
+        self.students = []
+        self.courses = []
 
-        def add_student(self, student):
-                        self.students.append(student)
+    def add_student(self, student):
+        self.students.append(student)
 
-        def remove_student(self, student_id):
-                        self.students = [student for student in self.students if student.student_id != student_id]
-                        
-        def search_student(self, student_id):
+    def remove_student(self, student_id):
+        self.students = [student for student in self.students if student.student_id != student_id]
+
+    def search_student(self, student_id):
+        for student in self.students:
+            if student.student_id == student_id:
+                return student
+        return None
+
+    def display_students(self):
+        for student in self.students:
+            print(student.display_info())
+
+    def sort_students_by_name(self):
+        self.students.sort(key=lambda st: st.name)
+
+    def sort_students_by_age(self):
+        self.students.sort(key=lambda st: st.age)
+
+    def add_course(self, course):
+        self.courses.append(course)
+
+    def get_course_by_id(self, course_id):
+        for course in self.courses:
+            if course.course_id == course_id:
+                return course
+        return None
+
+    def save_students_to_file(self, filename):
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['name', 'age', 'student_id', 'courses', 'logical_expression'])
             for student in self.students:
-                if student.student_id == student_id:
-                    return student
-                return None
+                course_ids = '|'.join(course.course_id for course in student.courses)
+                writer.writerow([student.name, student.age, student.student_id, course_ids, student.logical_expression])
 
-        def display_students(self):
-            for student in self.students:
-                print(student.display_info())
-        def sort_students_by_name(self):
-            self.students.sort(key=lambda st: st.name)#st=students
+    def load_students_from_file(self, filename):
+        try:
+            with open(filename, 'r', newline='') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    name = row['name']
+                    age = int(row['age'])
+                    student_id = row['student_id']
+                    course_ids = row['courses'].split('|')
+                    courses = [self.get_course_by_id(cid) for cid in course_ids if self.get_course_by_id(cid)]
+                    logical_expression = row['logical_expression']
+                    student = Student(name, age, student_id, courses, logical_expression)
+                    self.add_student(student)
+        except FileNotFoundError:
+            print(f"File {filename} not found.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
-        def sort_students_by_age(self):
-                self.students.sort(key=lambda st: st.age)
-                
-        def add_course(self, course):
-                self.courses.append(course)
+    @staticmethod
+    def evaluate_logical_expression(expression):
+        try:
+            return eval(expression)
+        except:
+            return False
 
-        def get_course_by_id(self, course_id):
-            for course in self.courses:
-                if course.course_id == course_id:
-                    return course
-            return None
+    def sort_by_logical_expression(self):
+        self.students.sort(key=lambda x: StudentManagementSystem.evaluate_logical_expression(x.logical_expression))
 
-        def save_students_to_file(self, filename):
-            with open(filename, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['name', 'age', 'student_id', 'course_id', 'course_name', 'instructor', 'logical_expression'])
-                for student in self.students:
-                    for course in student.courses:
-                        writer.writerow([student.name, student.age, student.student_id, course.course_id, course.course_name, course.instructor, student.logical_expression])
+    @staticmethod
+    def insertion_sort(students):
+        for i in range(1, len(students)):
+            key = students[i]
+            j = i - 1
+            while j >= 0 and key.age < students[j].age:
+                students[j + 1] = students[j]
+                j -= 1
+            students[j + 1] = key
+        return students
 
-        def load_students_from_file(self, filename):
-            try:
-                with open(filename, 'r') as file:
-                    for line in file:
-                        data = line.strip().split(', ')
-                        name = data[0].split(': ')[1]
-                        age = int(data[1].split(': ')[1])
-                        student_id = data[2].split(': ')[1]
-                        courses = data[3].split(': ')[1].split(', ')
-                        student = Student(name, age, student_id, courses)
-                        self.add_student(student)
-            except FileNotFoundError:
-                print(f"File {filename} not found.")
-            except Exception as e:
-                print(f"An error occurred: {e}")
-        def insertion_sort(students):
-            for i in range(1, len(students)):
-                key = students[i]
-                j = i - 1
-                while j >= 0 and key.age < students[j].age:
-                    students[j + 1] = students[j]
-                    j -= 1
-                students[j + 1] = key
-            return students
-        
-        def merge_sort(students):
-            if len(students) > 1:
-                mid = len(students) // 2
-                left_half = students[:mid]
-                right_half = students[mid:]
+    def merge_sort(students):
+        if len(students) > 1:
+            mid = len(students) // 2
+            left = students[:mid]
+            right = students[mid:]
 
-                merge_sort(left_half)
-                merge_sort(right_half)
+            StudentManagementSystem.merge_sort(left)
+            StudentManagementSystem.merge_sort(right)
 
-                i = j = k = 0
+            i = j = k = 0
+            while i < len(left) and j < len(right):
+                if left[i].age < right[j].age:
+                    students[k] = left[i]
+                    i += 1
+                else:
+                    students[k] = right[j]
+                    j += 1
+                k += 1
 
-                while i < len(left_half) and j < len(right_half):
-                    if left_half[i].age < right_half[j].age:
-                        students[k] = left_half[i]
-                        i += 1
-                    else:
-                        students[k] = right_half[j]
-                        j += 1
-                    k += 1
+            while i < len(left):
+                students[k] = left[i]
+                i += 1
+                k += 1
 
-                while i < len(left_half):
-                        students[k] = left_half[i]
-                        i += 1
-                        k += 1
+            while j < len(right):
+                students[k] = right[j]
+                j += 1
+                k += 1
+        return students
 
-                while j < len(right_half):
-                        students[k] = right_half[j]
-                        j += 1
-                        k += 1
-            return students
-        
-        def evaluate_logical_expression(expression):
-            try:
-                return eval(expression)
-            except:
-                return False 
-        def sort_by_logical_expression(students):
-            students.sort(key=lambda x: evaluate_logical_expression(x.logical_expression))
-            return students
-        
-        def measure_performance(sort_function, students):
-            start_time = time.time()
-            sorted_students = sort_function(students.copy())
-            end_time = time.time()
-            return end_time - start_time
-            
+    @staticmethod
+    def measure_performance(sort_function, students):
+        start_time = time.time()
+        sorted_students = sort_function(students.copy())
+        end_time = time.time()
+        return end_time - start_time
+    def analyze_performance(students):
+        insertion_sort_time = measure_performance(insertion_sort, students)
+        merge_sort_time = measure_performance(merge_sort, students)
+        logical_sort_time = measure_performance(sort_by_logical_expression, students)
+
+        print(f"Insertion Sort Time: {insertion_sort_time:.6f} seconds")
+        print(f"Merge Sort Time: {merge_sort_time:.6f} seconds")
+        print(f"Logical Sort Time: {logical_sort_time:.6f} seconds")
+
 def main():
     system = StudentManagementSystem()
     initial_courses = [
@@ -170,7 +184,7 @@ def main():
     ]
     for student in initial_students:
         system.add_student(student)
-        
+
     while True:
         print("\nStudent Management System")
         print("1. Add Student")
@@ -189,9 +203,9 @@ def main():
             name = input("Enter student name: ")
             age = int(input("Enter student age: "))
             student_id = input("Enter student ID: ")
-            courses_ids = input("Enter course IDs (comma-separated): ").split(',')
-            courses = [system.get_course_by_id(course_id) for course_id in courses_ids]
-            logical_expression = input("Enter logical expression (True/False): ")
+            course_ids = input("Enter course IDs (comma-separated): ").split(',')
+            courses = [system.get_course_by_id(cid.strip()) for cid in course_ids if system.get_course_by_id(cid.strip())]
+            logical_expression = input("Enter logical expression (e.g. True/False or any Python expression): ")
             student = Student(name, age, student_id, courses, logical_expression)
             system.add_student(student)
             print("Student added successfully.")
