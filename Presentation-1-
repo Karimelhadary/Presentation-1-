@@ -146,6 +146,12 @@ class StudentManagementSystem:
         def sort_by_logical_expression(students):
             students.sort(key=lambda x: evaluate_logical_expression(x.logical_expression))
             return students
+        
+        def measure_performance(sort_function, students):
+            start_time = time.time()
+            sorted_students = sort_function(students.copy())
+            end_time = time.time()
+            return end_time - start_time
             
 def main():
     system = StudentManagementSystem()
@@ -180,13 +186,15 @@ def main():
         choice = input("Enter your choice: ")
 
         if choice == '1':
-                name = input("Enter student name: ")
-                age = int(input("Enter student age: "))
-                student_id = input("Enter student ID: ")
-                courses = input("Enter courses (comma-separated): ").split(',')
-                student = Student(name, age, student_id, courses)
-                system.add_student(student)
-                print("Student added successfully.")
+            name = input("Enter student name: ")
+            age = int(input("Enter student age: "))
+            student_id = input("Enter student ID: ")
+            courses_ids = input("Enter course IDs (comma-separated): ").split(',')
+            courses = [system.get_course_by_id(course_id) for course_id in courses_ids]
+            logical_expression = input("Enter logical expression (True/False): ")
+            student = Student(name, age, student_id, courses, logical_expression)
+            system.add_student(student)
+            print("Student added successfully.")
 
         elif choice == '2':
             student_id = input("Enter student ID to remove: ")
