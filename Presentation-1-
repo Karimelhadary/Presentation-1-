@@ -106,8 +106,37 @@ class StudentManagementSystem:
                     j -= 1
                 students[j + 1] = key
             return students
+        
+        def merge_sort(students):
+            if len(students) > 1:
+                mid = len(students) // 2
+                left_half = students[:mid]
+                right_half = students[mid:]
 
-                
+                merge_sort(left_half)
+                merge_sort(right_half)
+
+                i = j = k = 0
+
+                while i < len(left_half) and j < len(right_half):
+                    if left_half[i].age < right_half[j].age:
+                        students[k] = left_half[i]
+                        i += 1
+                    else:
+                        students[k] = right_half[j]
+                        j += 1
+                    k += 1
+
+                while i < len(left_half):
+                        students[k] = left_half[i]
+                        i += 1
+                        k += 1
+
+                while j < len(right_half):
+                        students[k] = right_half[j]
+                        j += 1
+                        k += 1
+            return students     
 def main():
     system = StudentManagementSystem()
     initial_students = [
